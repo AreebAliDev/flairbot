@@ -90,20 +90,19 @@ class FlairBot:
     def process_pm(self, msg, author, target_sub):
         """Process unread PM."""
 
-        content = msg.body.split(',', 1)
-        class_name = content[0].rstrip()
+        author = str(msg.author) #get the author
+        body = msg.body.split(' ') #split the PM by spaces into an array
+        csscls = body[0] #the class will always be the first entry in the array
+        if len(body) > 1:
+            txt = (" ").join(body[1:])
+             #if the array is more than one item long (i.e there is custom text after the class name)
+             #then we join the remainder (from array position 1 - [1:]) into a string
+        else:
+            txt = '' #otherwise there is no custom text and we set it to empty
         subreddit = self.reddit.subreddit(target_sub)
-
-        if class_name in self.flairs:
-            if len(content) > 1:
-                flair_text = content[1].lstrip()[:64]
-            else:
-                flair_text = self.flairs[class_name] or ''
-
-            subreddit.flair.set(author, flair_text, class_name)
-            if self.logging:
-                self.log(author, flair_text, class_name)
-
+        subreddit.flair.set(author, txt, csscls)
+        if self.logging:
+            self.log(author, txt, csscls)
         msg.mark_read()
 
     @staticmethod
